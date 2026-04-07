@@ -1,0 +1,56 @@
+/* Dynamic Integrations CSS */
+.vcet-modal-overlay {
+  position: fixed; inset: 0; background: rgba(3,5,15,0.85); backdrop-filter: blur(8px);
+  z-index: 10000; display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.vcet-modal-overlay.active { opacity: 1; pointer-events: all; }
+
+.vcet-modal {
+  background: var(--bg2, #060b1a); border: 1px solid var(--border, rgba(0,200,255,0.12));
+  border-radius: 16px; padding: 2rem; width: 90%; max-width: 450px;
+  transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  position: relative;
+}
+.vcet-modal-overlay.active .vcet-modal { transform: translateY(0); }
+
+.vcet-modal-close {
+  position: absolute; top: 1rem; right: 1rem; background: transparent; border: none;
+  color: var(--muted, #7a8ab0); font-size: 1.5rem; cursor: pointer; transition: color 0.2s;
+}
+.vcet-modal-close:hover { color: var(--accent, #00c8ff); }
+
+.vcet-modal h3 { font-family: 'Syne', sans-serif; font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+.vcet-modal p { font-size: 0.85rem; color: var(--muted, #7a8ab0); margin-bottom: 1.5rem; }
+
+.vcet-form-group { margin-bottom: 1.2rem; }
+.vcet-form-group label { display: block; font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--text, #e8eeff); }
+.vcet-form-control {
+  width: 100%; padding: 0.8rem 1rem; border-radius: 8px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; transition: border-color 0.2s;
+}
+.vcet-form-control:focus { outline: none; border-color: var(--accent, #00c8ff); background: rgba(0,200,255,0.02); }
+
+.vcet-submit-btn {
+  width: 100%; padding: 1rem; border-radius: 8px; background: linear-gradient(135deg, var(--accent, #00c8ff), var(--accent2, #7b4fff));
+  color: #fff; border: none; font-weight: 600; font-size: 1rem; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s; margin-top: 0.5rem; display: flex; justify-content: center; align-items: center; gap: 8px;
+}
+.vcet-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,200,255,0.3); }
+.vcet-submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+.vcet-toast {
+  position: fixed; bottom: 2rem; right: 2rem; background: var(--surface, #0a1228);
+  border-left: 4px solid var(--accent, #00c8ff); padding: 1rem 1.5rem; border-radius: 8px;
+  color: #fff; z-index: 10001; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: 0.9rem;
+}
+.vcet-toast.show { transform: translateX(0); }
+.vcet-toast.error { border-left-color: #ff4f7b; }
+
+.loader-spinner {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCET — Vidyavardhini's College of Engineering & Technology</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #03050f;
+    --bg2: #060b1a;
+    --surface: #0a1228;
+    --surface2: #0f1a35;
+    --accent: #00c8ff;
+    --accent2: #7b4fff;
+    --accent3: #ff4f7b;
+    --gold: #f0c040;
+    --text: #e8eeff;
+    --muted: #7a8ab0;
+    --border: rgba(0,200,255,0.12);
+    --glow: 0 0 40px rgba(0,200,255,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s, height .2s, background .2s; mix-blend-mode: screen; }
+  .cursor-trail { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(0,200,255,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: left .12s ease, top .12s ease; }
+
+  /* STARS CANVAS */
+  #stars-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* FLOATING PARTICLES */
+  .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .particle { position: absolute; border-radius: 50%; opacity: 0; animation: floatUp linear infinite; }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    10% { opacity: 1; }
+    90% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-20vh) scale(1.5); }
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 0 2rem;
+    height: 70px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(3,5,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  nav.scrolled { background: rgba(3,5,15,0.97); box-shadow: 0 4px 40px rgba(0,0,0,0.5); }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700; font-size: 14px; color: #fff;
+    box-shadow: 0 0 20px rgba(0,200,255,0.3);
+  }
+  .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); letter-spacing: -0.02em; }
+  .nav-logo-sub { font-size: 0.65rem; color: var(--muted); font-weight: 300; }
+
+  .nav-links { display: flex; align-items: center; gap: 0; list-style: none; }
+  .nav-links > li { position: relative; }
+  .nav-links > li > a {
+    display: block; padding: 0 1rem; height: 70px; line-height: 70px;
+    color: var(--muted); font-size: 0.82rem; font-weight: 500; text-decoration: none;
+    letter-spacing: 0.03em; text-transform: uppercase;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .nav-links > li > a:hover, .nav-links > li > a.active { color: var(--accent); }
+  .nav-links > li > a::after { content: ''; position: absolute; bottom: 0; left: 1rem; right: 1rem; height: 2px; background: var(--accent); transform: scaleX(0); transition: transform 0.2s; }
+  .nav-links > li > a:hover::after { transform: scaleX(1); }
+
+  /* DROPDOWN */
+  .dropdown { position: absolute; top: 70px; left: 0; min-width: 240px; background: rgba(6,11,26,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; backdrop-filter: blur(20px); z-index: 100; }
+  .nav-links > li:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+  .dropdown a { display: block; padding: 0.6rem 1.2rem; color: var(--muted); font-size: 0.8rem; text-decoration: none; transition: all 0.15s; border-radius: 6px; margin: 0 0.3rem; }
+  .dropdown a:hover { color: var(--accent); background: rgba(0,200,255,0.06); padding-left: 1.5rem; }
+
+  /* SUB DROPDOWN */
+  .has-sub { position: relative; }
+  .has-sub > a::before { content: '›'; position: absolute; right: 8px; }
+  .sub-dropdown { position: absolute; left: 100%; top: 0; min-width: 220px; background: rgba(6,11,26,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem 0; opacity: 0; visibility: hidden; transform: translateX(-8px); transition: all 0.2s; backdrop-filter: blur(20px); }
+  .has-sub:hover .sub-dropdown { opacity: 1; visibility: visible; transform: translateX(0); }
+
+  .nav-cta {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff !important; border-radius: 8px; padding: 0.5rem 1.2rem !important;
+    height: auto !important; line-height: normal !important;
+    font-weight: 600 !important; font-size: 0.8rem !important;
+    transition: opacity 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+  .nav-cta::after { display: none !important; }
+
+  /* HAMBURGER */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1001; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--accent); transition: all 0.3s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* MOBILE MENU */
+  .mobile-menu { display: none; position: fixed; inset: 0; background: rgba(3,5,15,0.98); z-index: 999; padding: 100px 2rem 2rem; overflow-y: auto; backdrop-filter: blur(20px); }
+  .mobile-menu.open { display: block; }
+  .mobile-menu a { display: block; color: var(--text); text-decoration: none; padding: 0.8rem 0; border-bottom: 1px solid var(--border); font-size: 1rem; }
+  .mobile-menu a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 2rem 60px;
+    overflow: hidden;
+  }
+  .hero-bg-gradient {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(123,79,255,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 20%, rgba(0,200,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 30% 30% at 20% 80%, rgba(255,79,123,0.06) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  .hero-orbit {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(0,200,255,0.1);
+    animation: spin linear infinite;
+    pointer-events: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .orbit1 { width: 600px; height: 600px; top: 50%; left: 50%; margin: -300px 0 0 -300px; animation-duration: 40s; }
+  .orbit2 { width: 900px; height: 900px; top: 50%; left: 50%; margin: -450px 0 0 -450px; animation-duration: 70s; animation-direction: reverse; }
+  .orbit3 { width: 1200px; height: 1200px; top: 50%; left: 50%; margin: -600px 0 0 -600px; animation-duration: 100s; }
+
+  .orbit-dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    top: -4px; left: calc(50% - 4px);
+  }
+  .od1 { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .od2 { background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+  .od3 { background: var(--accent3); box-shadow: 0 0 12px var(--accent3); }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25);
+    border-radius: 100px; padding: 6px 16px; margin-bottom: 2rem;
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    animation: fadeSlideDown 0.8s ease forwards;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeSlideUp 0.9s 0.2s ease forwards;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1rem; color: var(--muted); max-width: 600px; margin: 0 auto 0.5rem;
+    font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 0.05em;
+    opacity: 0; animation: fadeSlideUp 0.9s 0.35s ease forwards;
+  }
+  .hero-desc {
+    font-size: 1.05rem; color: rgba(232,238,255,0.65); max-width: 540px; margin: 0.8rem auto 2.5rem;
+    line-height: 1.7;
+    opacity: 0; animation: fadeSlideUp 0.9s 0.5s ease forwards;
+  }
+  .hero-badges-row {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin-bottom: 3rem;
+    opacity: 0; animation: fadeSlideUp 0.9s 0.6s ease forwards;
+  }
+  .hero-tag {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px; padding: 5px 14px;
+    font-size: 0.75rem; color: var(--muted); font-family: 'Space Mono', monospace;
+  }
+  .hero-ctas {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 4rem;
+    opacity: 0; animation: fadeSlideUp 0.9s 0.7s ease forwards;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; padding: 0.9rem 2.2rem; border-radius: 12px;
+    font-weight: 600; font-size: 0.9rem; text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(0,200,255,0.2);
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 40px rgba(0,200,255,0.35); }
+  .btn-secondary {
+    background: transparent; color: var(--text); padding: 0.9rem 2.2rem; border-radius: 12px;
+    font-weight: 500; font-size: 0.9rem; text-decoration: none; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,200,255,0.05); }
+
+  .hero-stats {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem;
+    opacity: 0; animation: fadeSlideUp 0.9s 0.85s ease forwards;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--accent); letter-spacing: -0.03em; }
+  .hero-stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  @keyframes fadeSlideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeSlideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+  /* SCROLL INDICATOR */
+  .scroll-ind {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    opacity: 0; animation: fadeSlideUp 1s 1.2s ease forwards;
+  }
+  .scroll-ind span { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Space Mono', monospace; }
+  .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollPulse 2s infinite; }
+  @keyframes scrollPulse { 0%,100% { opacity: 0.4; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.3); } }
+
+  /* SECTION BASE */
+  section { position: relative; z-index: 1; }
+  .section-pad { padding: 7rem 2rem; }
+  .container { max-width: 1280px; margin: 0 auto; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .section-label::before { content: ''; width: 30px; height: 1px; background: var(--accent); }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -0.03em; line-height: 1.1;
+  }
+  .section-title .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.7; margin-top: 0.8rem; }
+
+  /* NOTICE TICKER */
+  .notice-bar {
+    background: rgba(0,200,255,0.06);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 0; overflow: hidden;
+    position: relative; z-index: 2;
+  }
+  .notice-inner { display: flex; align-items: center; gap: 0; }
+  .notice-tag {
+    flex-shrink: 0; background: var(--accent); color: #03050f;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700;
+    padding: 4px 14px; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-right: 2rem; border-radius: 4px;
+  }
+  .notice-scroll { display: flex; gap: 4rem; animation: scrollLeft 35s linear infinite; white-space: nowrap; }
+  .notice-scroll:hover { animation-play-state: paused; }
+  .notice-item { font-size: 0.82rem; color: var(--muted); }
+  .notice-item a { color: var(--text); text-decoration: none; transition: color 0.2s; }
+  .notice-item a:hover { color: var(--accent); }
+  .notice-sep { color: var(--accent); }
+  @keyframes scrollLeft { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ABOUT SECTION */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .about-visual {
+    position: relative; aspect-ratio: 1;
+    max-width: 520px;
+  }
+  .about-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px dashed rgba(0,200,255,0.15);
+    animation: spin linear infinite;
+  }
+  .about-ring-1 { inset: 0; animation-duration: 30s; }
+  .about-ring-2 { inset: 10%; animation-duration: 20s; animation-direction: reverse; border-style: solid; border-color: rgba(123,79,255,0.1); }
+  .about-center {
+    position: absolute; inset: 20%;
+    background: var(--surface);
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 0.5rem;
+    box-shadow: var(--glow), inset 0 0 60px rgba(0,200,255,0.03);
+  }
+  .about-year { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; color: var(--accent); letter-spacing: -0.04em; }
+  .about-year-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Space Mono', monospace; }
+  .about-floating {
+    position: absolute; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem 1rem;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem;
+    animation: floatBob 4s ease-in-out infinite;
+  }
+  .af1 { top: 8%; right: 5%; animation-delay: 0s; }
+  .af2 { bottom: 12%; left: 2%; animation-delay: 1.5s; }
+  .af3 { top: 50%; right: -4%; animation-delay: 3s; }
+  .af-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--accent); }
+  @keyframes floatBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  .about-accreditations { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .accred-badge {
+    background: rgba(0,200,255,0.07); border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 8px; padding: 0.4rem 0.9rem;
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--accent);
+  }
+
+  /* DEPARTMENTS */
+  .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .dept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: all 0.3s; position: relative; overflow: hidden; cursor: pointer;
+    text-decoration: none; color: inherit; display: block;
+  }
+  .dept-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,200,255,0.05), rgba(123,79,255,0.05));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .dept-card:hover { transform: translateY(-6px); border-color: rgba(0,200,255,0.3); box-shadow: var(--glow); }
+  .dept-card:hover::before { opacity: 1; }
+  .dept-icon {
+    width: 52px; height: 52px; border-radius: 14px; margin-bottom: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, rgba(0,200,255,0.15), rgba(123,79,255,0.15));
+    border: 1px solid rgba(0,200,255,0.2);
+  }
+  .dept-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; line-height: 1.3; }
+  .dept-meta { font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.8rem; font-family: 'Space Mono', monospace; }
+  .dept-arrow { margin-left: auto; color: var(--accent); opacity: 0; transform: translateX(-8px); transition: all 0.3s; }
+  .dept-card:hover .dept-arrow { opacity: 1; transform: translateX(0); }
+
+  /* ADMISSIONS */
+  .admissions-section { background: var(--bg2); }
+  .admission-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4rem; align-items: start; margin-top: 3rem; }
+  .admission-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .adm-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.4rem 1.6rem;
+    display: flex; align-items: center; gap: 1rem;
+    cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
+  }
+  .adm-card:hover { border-color: rgba(0,200,255,0.3); transform: translateX(6px); }
+  .adm-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .adm-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .adm-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .adm-arrow { margin-left: auto; color: var(--accent); }
+
+  .courses-table {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+  }
+  .courses-table table { width: 100%; border-collapse: collapse; }
+  .courses-table th {
+    background: rgba(0,200,255,0.08); color: var(--accent);
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 1rem 1.5rem; text-align: left;
+  }
+  .courses-table td { padding: 1rem 1.5rem; font-size: 0.88rem; border-top: 1px solid var(--border); }
+  .courses-table tr:hover td { background: rgba(0,200,255,0.03); }
+  .intake-num { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent); font-size: 1.1rem; }
+
+  /* PLACEMENTS */
+  .placements-section { background: var(--bg); }
+  .placement-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 3rem 0; }
+  .pl-stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; text-align: center;
+    transition: all 0.3s;
+  }
+  .pl-stat-card:hover { border-color: rgba(0,200,255,0.3); box-shadow: var(--glow); transform: translateY(-4px); }
+  .pl-stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.8rem; letter-spacing: -0.04em; color: var(--accent); }
+  .pl-stat-year { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; letter-spacing: 0.08em; }
+  .pl-stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .recruiters-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem; text-align: center; }
+  .recruiters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+  .recruiter-chip {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.9rem 1.2rem; text-align: center;
+    font-weight: 600; font-size: 0.85rem;
+    transition: all 0.2s; color: var(--muted);
+  }
+  .recruiter-chip:hover { border-color: rgba(0,200,255,0.3); color: var(--text); background: rgba(0,200,255,0.04); }
+
+  /* ACHIEVEMENTS */
+  .achievements-section { background: var(--bg2); }
+  .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .ach-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.6rem;
+    position: relative; overflow: hidden;
+    transition: all 0.3s;
+  }
+  .ach-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transform: scaleX(0); transition: transform 0.3s; }
+  .ach-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .ach-card:hover::before { transform: scaleX(1); }
+  .ach-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+  .ach-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--accent); margin-bottom: 0.4rem; }
+  .ach-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+  /* FACILITIES */
+  .facilities-section { background: var(--bg); }
+  .fac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 3rem; }
+  .fac-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.6rem 1.2rem; text-align: center;
+    cursor: pointer; transition: all 0.3s; text-decoration: none; color: inherit;
+  }
+  .fac-card:hover { border-color: rgba(123,79,255,0.4); transform: translateY(-5px); box-shadow: 0 0 30px rgba(123,79,255,0.15); }
+  .fac-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .fac-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .fac-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+
+  /* RESEARCH */
+  .research-section { background: var(--bg2); }
+  .research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .res-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+    transition: all 0.3s; text-decoration: none; color: inherit; display: block;
+  }
+  .res-card:hover { border-color: rgba(240,192,64,0.4); box-shadow: 0 0 30px rgba(240,192,64,0.1); transform: translateY(-4px); }
+  .res-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.5rem; color: var(--gold); letter-spacing: -0.04em; }
+  .res-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin: 0.5rem 0 0.4rem; }
+  .res-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* STUDENT LIFE */
+  .student-section { background: var(--bg); }
+  .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 3rem; }
+  .student-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.5rem; transition: all 0.3s; cursor: pointer;
+    text-decoration: none; color: inherit; display: block;
+  }
+  .student-card:hover { border-color: rgba(255,79,123,0.4); transform: translateY(-4px); box-shadow: 0 0 30px rgba(255,79,123,0.1); }
+  .student-cat { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--accent3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .student-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .student-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
+
+  /* EVENTS */
+  .events-section { background: var(--bg2); }
+  .events-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 3rem; }
+  .event-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.4rem 1.8rem;
+    display: flex; align-items: center; gap: 2rem;
+    transition: all 0.2s; cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .event-item:hover { border-color: rgba(0,200,255,0.3); transform: translateX(8px); }
+  .event-date { flex-shrink: 0; text-align: center; width: 60px; }
+  .event-day { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--accent); line-height: 1; }
+  .event-month { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .event-divider { width: 1px; height: 50px; background: var(--border); flex-shrink: 0; }
+  .event-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
+  .event-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+  .event-arrow { margin-left: auto; color: var(--accent); }
+
+  /* COMMITTEES */
+  .committees-section { background: var(--bg); }
+  .comm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 3rem; }
+  .comm-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.3rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+    cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
+  }
+  .comm-card:hover { border-color: rgba(0,200,255,0.3); background: rgba(0,200,255,0.03); }
+  .comm-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .comm-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .comm-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  /* TESTIMONIALS */
+  .testimonials-section { background: var(--bg2); }
+  .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .test-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; position: relative; transition: all 0.3s;
+  }
+  .test-card:hover { transform: translateY(-4px); box-shadow: var(--glow); border-color: rgba(0,200,255,0.25); }
+  .test-quote { font-size: 3rem; color: var(--accent); opacity: 0.3; line-height: 1; margin-bottom: 0.5rem; font-family: Georgia, serif; }
+  .test-text { font-size: 0.88rem; color: rgba(232,238,255,0.75); line-height: 1.75; font-style: italic; }
+  .test-author { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+  .test-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'Syne', sans-serif; }
+  .test-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .test-role { font-size: 0.75rem; color: var(--muted); }
+
+  /* GALLERY */
+  .gallery-section { background: var(--bg); }
+  .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 160px); gap: 1rem; margin-top: 3rem; }
+  .gallery-item {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; cursor: pointer;
+    position: relative;
+  }
+  .gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+  .gallery-item:hover { transform: scale(1.02); border-color: rgba(0,200,255,0.3); }
+  .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(3,5,15,0.8), transparent); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 1.2rem; }
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+  .gallery-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .gallery-emoji { font-size: 2.5rem; }
+
+  /* ACCREDITATION */
+  .naac-section { background: var(--bg2); }
+  .naac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-top: 3rem; }
+  .naac-score-visual {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 3rem; text-align: center; gap: 0.5rem;
+  }
+  .naac-score { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 5rem; letter-spacing: -0.04em; color: var(--gold); }
+  .naac-grade { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .naac-links { display: flex; flex-direction: column; gap: 1rem; }
+  .naac-link {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+    cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
+  }
+  .naac-link:hover { border-color: rgba(240,192,64,0.4); background: rgba(240,192,64,0.04); }
+  .naac-link-icon { font-size: 1.4rem; }
+  .naac-link-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .naac-link-sub { font-size: 0.75rem; color: var(--muted); }
+
+  /* EXPLORE */
+  .explore-section { background: var(--bg); }
+  .explore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .explore-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem; text-align: center; cursor: pointer; transition: all 0.3s;
+    text-decoration: none; color: inherit; display: block;
+  }
+  .explore-card:hover { transform: translateY(-6px); border-color: rgba(0,200,255,0.3); box-shadow: var(--glow); }
+  .explore-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .explore-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; }
+  .explore-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
+
+  /* CONTACT / FOOTER */
+  footer { background: var(--surface); border-top: 1px solid var(--border); padding: 5rem 2rem 2rem; position: relative; z-index: 1; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; gap: 3rem; margin-bottom: 4rem; }
+  .footer-brand { }
+  .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.02em; margin-bottom: 0.8rem; }
+  .footer-tagline { font-size: 0.83rem; color: var(--muted); line-height: 1.7; max-width: 280px; }
+  .footer-contact { margin-top: 1.5rem; }
+  .footer-contact p { font-size: 0.82rem; color: var(--muted); line-height: 1.8; }
+  .footer-contact a { color: var(--accent); text-decoration: none; }
+  .footer-heading { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; margin-bottom: 1.2rem; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-links a { font-size: 0.82rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--accent); }
+  .social-links { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+  .social-link {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .social-link:hover { border-color: var(--accent); background: rgba(0,200,255,0.1); }
+  .footer-bottom { border-top: 1px solid var(--border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .footer-copy { font-size: 0.78rem; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .footer-links-bottom { display: flex; gap: 1.5rem; }
+  .footer-links-bottom a { font-size: 0.78rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links-bottom a:hover { color: var(--accent); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .about-grid { grid-template-columns: 1fr; }
+    .about-visual { max-width: 360px; margin: 0 auto; }
+    .admission-grid { grid-template-columns: 1fr; }
+    .research-grid { grid-template-columns: 1fr 1fr; }
+    .placement-stats { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-item:first-child { grid-column: span 1; grid-row: span 1; }
+    .naac-grid { grid-template-columns: 1fr; }
+    .explore-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 2.4rem; }
+    .hero-stats { gap: 1.5rem; }
+    .section-pad { padding: 4rem 1.2rem; }
+    .research-grid { grid-template-columns: 1fr; }
+    .placement-stats { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .explore-grid { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  }
+
+  /* REVEAL ANIMATIONS */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* GLOW DIVIDER */
+  .glow-divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent); opacity: 0.3; }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<!-- STARS -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">VC</div>
+    <div>
+      <div class="nav-logo-text">VCET</div>
+      <div class="nav-logo-sub">Vasai Road</div>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li>
+      <a href="#about">About Us</a>
+      <div class="dropdown">
+        <a href="#about">About VCET</a>
+        <a href="#">President's Desk</a>
+        <a href="#">Principal's Desk</a>
+        <a href="#">Governing Council</a>
+        <a href="#">Organizational Structure</a>
+        <a href="#">Administration</a>
+        <a href="#">Strategic Plan</a>
+        <a href="#">Code Of Conduct</a>
+      </div>
+    </li>
+    <li>
+      <a href="#admissions">Admissions</a>
+      <div class="dropdown">
+        <a href="#admissions">Courses & Intake</a>
+        <a href="#">Fee Structure 25-26</a>
+        <a href="#">Scholarships</a>
+        <a href="#">Brochure</a>
+        <a href="#">Documents Required</a>
+        <div class="has-sub">
+          <a href="#">Cut Off 25-26</a>
+          <div class="sub-dropdown">
+            <a href="#">FE Cut Off</a>
+            <a href="#">DSE Cut Off</a>
+            <a href="#">ME Cut Off</a>
+            <a href="#">MMS Cut Off</a>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li>
+      <a href="#departments">Departments</a>
+      <div class="dropdown">
+        <a href="#">Computer Engineering</a>
+        <a href="#">CS & Engg (Data Science)</a>
+        <a href="#">Information Technology</a>
+        <a href="#">AI & Data Science</a>
+        <a href="#">Mechanical Engineering</a>
+        <a href="#">Electronics & Telecom</a>
+        <a href="#">Civil Engineering</a>
+        <a href="#">First Year Engineering</a>
+      </div>
+    </li>
+    <li>
+      <a href="#academics">Academics</a>
+      <div class="dropdown">
+        <a href="#">Dean Academics's Desk</a>
+        <a href="#">Academic Calendar</a>
+        <a href="#">Teaching Learning Process</a>
+        <a href="#">Swayam-NPTEL</a>
+        <a href="#">Honours-Minor-Degree</a>
+      </div>
+    </li>
+    <li>
+      <a href="#research">Research</a>
+      <div class="dropdown">
+        <a href="#">Introduction</a>
+        <a href="#">Funded Research</a>
+        <a href="#">Publications</a>
+        <a href="#">Patents</a>
+        <a href="#">Consultancy Projects</a>
+        <a href="#">IIC</a>
+        <a href="#">NIRF</a>
+      </div>
+    </li>
+    <li>
+      <a href="#facilities">Facilities</a>
+      <div class="dropdown">
+        <a href="#">Computing Facility</a>
+        <a href="#">Library</a>
+        <a href="#">Counselling Cell</a>
+        <a href="#">Sports & Gymkhana</a>
+        <a href="#">Health Facilities</a>
+        <a href="#">Differently-abled Facilities</a>
+      </div>
+    </li>
+    <li>
+      <a href="#student-life">Student Life</a>
+      <div class="dropdown">
+        <a href="#">Students' Council</a>
+        <a href="#">Cultural Committee</a>
+        <a href="#">NSS</a>
+        <a href="#">IEEE</a>
+        <a href="#">Students Club</a>
+        <a href="#">HACKATHON</a>
+        <a href="#">CSI / IETE</a>
+      </div>
+    </li>
+    <li>
+      <a href="#placements">Placements</a>
+      <div class="dropdown">
+        <a href="#">Placement</a>
+        <a href="#">Training</a>
+        <a href="#">E-CELL</a>
+        <a href="#">IIIC</a>
+      </div>
+    </li>
+    <li>
+      <a href="#naac">NAAC</a>
+      <div class="dropdown">
+        <a href="#">SSS Report</a>
+        <a href="#">SSR Cycle 1</a>
+        <a href="#">SSR Cycle 2</a>
+        <a href="#">NAAC Score</a>
+        <a href="#">Best Practices</a>
+      </div>
+    </li>
+    <li><a href="https://alumni.vcet.edu.in/" target="_blank">Alumni</a></li>
+    <li><a href="#contact" class="nav-cta">Apply Now</a></li>
+  </ul>
+
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobile()">About Us</a>
+  <a href="#admissions" onclick="closeMobile()">Admissions</a>
+  <a href="#departments" onclick="closeMobile()">Departments</a>
+  <a href="#academics" onclick="closeMobile()">Academics</a>
+  <a href="#research" onclick="closeMobile()">Research</a>
+  <a href="#facilities" onclick="closeMobile()">Facilities</a>
+  <a href="#student-life" onclick="closeMobile()">Student Life</a>
+  <a href="#placements" onclick="closeMobile()">Placements</a>
+  <a href="#naac" onclick="closeMobile()">NAAC</a>
+  <a href="https://alumni.vcet.edu.in/" target="_blank">Alumni Portal</a>
+  <a href="#contact" onclick="closeMobile()" style="color:var(--accent);font-weight:700;">Apply Now →</a>
+</div>
+
+<!-- NOTICE TICKER -->
+<div class="notice-bar" style="margin-top:70px;">
+  <div class="notice-inner container">
+    <div class="notice-tag">📢 Notice</div>
+    <div style="overflow:hidden;flex:1;">
+      <div class="notice-scroll">
+        <span class="notice-item">🔴 <a href="#">CUT OFF F.E 25-26 — Updated</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">🎉 <a href="#">OSCILLATIONS & VNPS'26 — Register Now</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">📋 <a href="#">Admission Enquiry for B.E. Courses A.Y. 2026-27</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">🔬 <a href="#">2026 IEEE IC3ET International Conference</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">📄 <a href="#">DSE / ME / MMS Cut Off 25-26 Published</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">💼 <a href="#">M.E. Admission Enquiry Form 2026-27 Open</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">🔴 <a href="#">CUT OFF F.E 25-26 — Updated</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">🎉 <a href="#">OSCILLATIONS & VNPS'26 — Register Now</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">📋 <a href="#">Admission Enquiry for B.E. Courses A.Y. 2026-27</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">🔬 <a href="#">2026 IEEE IC3ET International Conference</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">📄 <a href="#">DSE / ME / MMS Cut Off 25-26 Published</a></span>
+        <span class="notice-sep">◆</span>
+        <span class="notice-item">💼 <a href="#">M.E. Admission Enquiry Form 2026-27 Open</a></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg-gradient"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orbit orbit1"><div class="orbit-dot od1"></div></div>
+  <div class="hero-orbit orbit2"><div class="orbit-dot od2"></div></div>
+  <div class="hero-orbit orbit3"><div class="orbit-dot od3"></div></div>
+
+  <div style="position:relative;z-index:2;">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      NBA & NAAC Accredited — Autonomous Institute
+    </div>
+
+    <h1>
+      Engineering<br>
+      <span class="grad">Tomorrow's</span><br>
+      Innovators
+    </h1>
+
+    <p class="hero-sub">Vidyavardhini's College of Engineering & Technology, Vasai Road</p>
+    <p class="hero-desc">Affiliated to University of Mumbai · Approved by AICTE & DTE<br>Shaping minds, building futures since 1994.</p>
+
+    <div class="hero-badges-row">
+      <div class="hero-tag">Autonomous Institute</div>
+      <div class="hero-tag">University of Mumbai</div>
+      <div class="hero-tag">AICTE Approved</div>
+      <div class="hero-tag">DTE Approved</div>
+      <div class="hero-tag">NBA Accredited</div>
+    </div>
+
+    <div class="hero-ctas">
+      <a href="#admissions" class="btn-primary">Apply for Admission →</a>
+      <a href="#departments" class="btn-secondary">Explore Departments</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">30+</div>
+        <div class="hero-stat-label">Years of Excellence</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">8</div>
+        <div class="hero-stat-label">Engineering Depts</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">299+</div>
+        <div class="hero-stat-label">Annual Placements</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">1.06Cr</div>
+        <div class="hero-stat-label">Top Package</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section-pad" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-ring about-ring-1"></div>
+        <div class="about-ring about-ring-2"></div>
+        <div class="about-center">
+          <div class="about-year">1994</div>
+          <div class="about-year-label">Year Founded</div>
+          <div style="font-size:0.78rem;color:var(--muted);padding:0 1rem;text-align:center;margin-top:0.5rem;">Established under Vidyavardhini Society, 1970</div>
+        </div>
+        <div class="about-floating af1">
+          <div class="af-val">NBA</div>
+          <div style="font-size:0.65rem;color:var(--muted);">Accredited</div>
+        </div>
+        <div class="about-floating af2">
+          <div class="af-val">NAAC</div>
+          <div style="font-size:0.65rem;color:var(--muted);">Certified</div>
+        </div>
+        <div class="about-floating af3">
+          <div class="af-val">8+</div>
+          <div style="font-size:0.65rem;color:var(--muted);">Depts</div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="section-label">About VCET</div>
+        <h2 class="section-title">A Legacy of <span class="grad">Knowledge</span> & Innovation</h2>
+        <p class="section-sub" style="margin-bottom:1.2rem;">
+          Vidyavardhini's College of Engineering & Technology is a premier autonomous engineering institution affiliated to the University of Mumbai. Established under the Vidyavardhini Society — founded in 1970 by the late Padmashri H.G. alias Bhausaheb Vartak — VCET carries a proud tradition of transforming rural education through technological excellence.
+        </p>
+        <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;">
+          Our campus fosters an environment that ignites curiosity, sharpens skills, and nurtures future-ready engineers and managers. With state-of-the-art laboratories, strong industry connections, and a vibrant student community, VCET stands as a beacon of academic rigor and innovation.
+        </p>
+
+        <div class="about-accreditations">
+          <span class="accred-badge">NBA Accredited</span>
+          <span class="accred-badge">NAAC Certified</span>
+          <span class="accred-badge">Autonomous Institute</span>
+          <span class="accred-badge">AICTE Approved</span>
+          <span class="accred-badge">DTE Approved</span>
+          <span class="accred-badge">IIC Cell</span>
+        </div>
+
+        <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="#" class="btn-primary" style="font-size:0.85rem;padding:0.75rem 1.8rem;">Know More →</a>
+          <a href="#" class="btn-secondary" style="font-size:0.85rem;padding:0.75rem 1.8rem;">Download Brochure</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- DEPARTMENTS -->
+<section class="section-pad" id="departments">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Academic Programs</div>
+      <h2 class="section-title">Our <span class="grad">Departments</span></h2>
+      <p class="section-sub">Eight cutting-edge departments offering undergraduate and postgraduate programs in engineering and management.</p>
+    </div>
+
+    <div class="dept-grid">
+      <a href="https://vcet.edu.in/computer-engineering/" target="_blank" class="dept-card reveal">
+        <div class="dept-icon">💻</div>
+        <div class="dept-name">Computer Engineering</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">120 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/computer-science-and-engineering-data-science/" target="_blank" class="dept-card reveal reveal-delay-1">
+        <div class="dept-icon">📊</div>
+        <div class="dept-name">CS & Engg (Data Science)</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/information-technology/" target="_blank" class="dept-card reveal reveal-delay-2">
+        <div class="dept-icon">🌐</div>
+        <div class="dept-name">Information Technology</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/artificial-intelligence-and-data-science/" target="_blank" class="dept-card reveal">
+        <div class="dept-icon">🤖</div>
+        <div class="dept-name">AI & Data Science</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/mechanical-engineering/" target="_blank" class="dept-card reveal reveal-delay-1">
+        <div class="dept-icon">⚙️</div>
+        <div class="dept-name">Mechanical Engineering</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/electronics-and-telecommunication-engineering/" target="_blank" class="dept-card reveal reveal-delay-2">
+        <div class="dept-icon">📡</div>
+        <div class="dept-name">Electronics & Telecom</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/civil-engineering-2/" target="_blank" class="dept-card reveal">
+        <div class="dept-icon">🏗️</div>
+        <div class="dept-name">Civil Engineering</div>
+        <div class="dept-meta">B.E. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+      <a href="https://vcet.edu.in/mms/" target="_blank" class="dept-card reveal reveal-delay-1">
+        <div class="dept-icon">📈</div>
+        <div class="dept-name">MMS (MBA)</div>
+        <div class="dept-meta">M.M.S. Program <span style="margin-left:auto;color:var(--accent)">60 seats</span></div>
+        <div class="dept-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ADMISSIONS -->
+<section class="section-pad admissions-section" id="admissions">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Admissions 2026–27</div>
+      <h2 class="section-title">Start Your <span class="grad">Journey</span> Here</h2>
+      <p class="section-sub">Everything you need to know about joining VCET — from course details to scholarships.</p>
+    </div>
+
+    <div class="admission-grid">
+      <div class="admission-cards reveal">
+        <a href="https://forms.gle/uh7sZS5JLzn2RecG7" target="_blank" class="adm-card" style="border-color:rgba(0,200,255,0.3);background:rgba(0,200,255,0.04);">
+          <div class="adm-icon">🎓</div>
+          <div>
+            <div class="adm-title">B.E. Admission Enquiry</div>
+            <div class="adm-sub">4-Year UG Engineering · A.Y. 2026-27 · Apply Now</div>
+          </div>
+          <div class="adm-arrow">→</div>
+        </a>
+        <a href="https://forms.gle/kb1AXRDA4xGeo3kT7" target="_blank" class="adm-card">
+          <div class="adm-icon">🔬</div>
+          <div>
+            <div class="adm-title">M.E. Admission Enquiry</div>
+            <div class="adm-sub">Postgraduate Engineering · 2026-27</div>
+          </div>
+          <div class="adm-arrow">→</div>
+        </a>
+        <a href="https://forms.gle/VF3BzuyNPp2u3cBT9" target="_blank" class="adm-card">
+          <div class="adm-icon">💼</div>
+          <div>
+            <div class="adm-title">MMS Admission Enquiry</div>
+            <div class="adm-sub">MBA Management Program · 2026-27</div>
+          </div>
+          <div class="adm-arrow">→</div>
+        </a>
+        <a href="https://vcet.edu.in/scholarships/" target="_blank" class="adm-card">
+          <div class="adm-icon">🏅</div>
+          <div>
+            <div class="adm-title">Scholarships</div>
+            <div class="adm-sub">Government & Merit-based scholarships available</div>
+          </div>
+          <div class="adm-arrow">→</div>
+        </a>
+        <a href="https://vcet.edu.in/CollegeBrochure/CollegeBrochure2025-26.pdf" target="_blank" class="adm-card">
+          <div class="adm-icon">📄</div>
+          <div>
+            <div class="adm-title">Download Brochure</div>
+            <div class="adm-sub">College Brochure 2025–26 PDF</div>
+          </div>
+          <div class="adm-arrow">↓</div>
+        </a>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="courses-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Program</th>
+                <th>Course</th>
+                <th>Intake</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>B.E.</td><td>Computer Engineering</td><td><span class="intake-num">120</span></td></tr>
+              <tr><td>B.E.</td><td>Information Technology</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>B.E.</td><td>CS & Engg (DS)</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>B.E.</td><td>AI & Data Science</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>B.E.</td><td>Electronics & Telecom</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>B.E.</td><td>Mechanical Engineering</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>B.E.</td><td>Civil Engineering</td><td><span class="intake-num">60</span></td></tr>
+              <tr><td>M.E.</td><td>Structural Engineering</td><td><span class="intake-num">18</span></td></tr>
+              <tr><td>M.M.S.</td><td>MBA / MMS</td><td><span class="intake-num">60</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:0.8rem;flex-wrap:wrap;">
+          <a href="https://vcet.edu.in/fees-structure-fe-dse-mestructural-engineeringmms/" target="_blank" class="btn-secondary" style="font-size:0.82rem;padding:0.65rem 1.4rem;">Fee Structure →</a>
+          <a href="https://vcet.edu.in/documents-required-fedsemestructural-engineeringmms/" target="_blank" class="btn-secondary" style="font-size:0.82rem;padding:0.65rem 1.4rem;">Documents Required →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- EVENTS -->
+<section class="section-pad events-section" id="events" style="background:var(--bg);">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;" class="reveal">
+      <div>
+        <div class="section-label">What's On</div>
+        <h2 class="section-title">Upcoming <span class="grad">Events</span></h2>
+      </div>
+      <a href="#" class="btn-secondary" style="font-size:0.82rem;padding:0.65rem 1.4rem;">View All</a>
+    </div>
+
+    <div class="events-list">
+      <a href="https://vcet.edu.in/VNPS2026/" target="_blank" class="event-item reveal">
+        <div class="event-date"><div class="event-day">01</div><div class="event-month">Apr 2026</div></div>
+        <div class="event-divider"></div>
+        <div><div class="event-title">VNPS'26 — OSCILLATIONS</div><div class="event-sub">Annual National Project Symposium · VCET Campus</div></div>
+        <div class="event-arrow">→</div>
+      </a>
+      <a href="https://ic3et.in/" target="_blank" class="event-item reveal reveal-delay-1">
+        <div class="event-date"><div class="event-day">09</div><div class="event-month">Feb 2026</div></div>
+        <div class="event-divider"></div>
+        <div><div class="event-title">IEEE IC3ET 2026 International Conference</div><div class="event-sub">Communication, Computing & Emerging Technologies</div></div>
+        <div class="event-arrow">→</div>
+      </a>
+      <a href="#" target="_blank" class="event-item reveal reveal-delay-2">
+        <div class="event-date"><div class="event-day">01</div><div class="event-month">Mar 2026</div></div>
+        <div class="event-divider"></div>
+        <div><div class="event-title">NSM Sponsored HPC FDP VCET 2026</div><div class="event-sub">Faculty Development Programme · High Performance Computing</div></div>
+        <div class="event-arrow">→</div>
+      </a>
+      <a href="#" target="_blank" class="event-item reveal">
+        <div class="event-date"><div class="event-day">16</div><div class="event-month">Jan 2026</div></div>
+        <div class="event-divider"></div>
+        <div><div class="event-title">ZEAL 2026</div><div class="event-sub">Annual Technical & Cultural Fest · VCET</div></div>
+        <div class="event-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- PLACEMENTS -->
+<section class="section-pad placements-section" id="placements">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Training & Placements</div>
+      <h2 class="section-title">Career <span class="grad">Success</span> Stories</h2>
+      <p class="section-sub">Our students are placed in top companies worldwide, with a record package of ₹1.06 Crore per annum.</p>
+    </div>
+
+    <div class="placement-stats reveal">
+      <div class="pl-stat-card"><div class="pl-stat-num">299</div><div class="pl-stat-year">2017-18</div><div class="pl-stat-label">Students Placed</div></div>
+      <div class="pl-stat-card"><div class="pl-stat-num">320</div><div class="pl-stat-year">2018-19</div><div class="pl-stat-label">Students Placed</div></div>
+      <div class="pl-stat-card"><div class="pl-stat-num">305</div><div class="pl-stat-year">2020-21</div><div class="pl-stat-label">Students Placed</div></div>
+      <div class="pl-stat-card" style="border-color:rgba(0,200,255,0.3);"><div class="pl-stat-num" style="color:var(--accent3);">1.06Cr</div><div class="pl-stat-year">2024</div><div class="pl-stat-label">Top Package (Perplexity)</div></div>
+    </div>
+
+    <div class="reveal">
+      <p class="recruiters-label">Our Trusted Recruiters</p>
+      <div class="recruiters-grid">
+        <div class="recruiter-chip">Mahindra</div>
+        <div class="recruiter-chip">Infosys</div>
+        <div class="recruiter-chip">Capgemini</div>
+        <div class="recruiter-chip">Wipro</div>
+        <div class="recruiter-chip">Cognizant</div>
+        <div class="recruiter-chip">IBM</div>
+        <div class="recruiter-chip">Accenture</div>
+        <div class="recruiter-chip">L&T</div>
+        <div class="recruiter-chip">Tata Power</div>
+        <div class="recruiter-chip">Hexaware</div>
+        <div class="recruiter-chip">Vodafone</div>
+        <div class="recruiter-chip">Schneider</div>
+        <div class="recruiter-chip">Godrej Infotech</div>
+        <div class="recruiter-chip">Zeus Learning</div>
+        <div class="recruiter-chip">Bristlecone</div>
+        <div class="recruiter-chip">LTI</div>
+        <div class="recruiter-chip">Neebal Tech</div>
+        <div class="recruiter-chip">Technimant</div>
+        <div class="recruiter-chip">Vistaar</div>
+        <div class="recruiter-chip">Interactive Brokers</div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;" class="reveal">
+      <a href="https://vcet.edu.in/placement-2/" target="_blank" class="btn-primary" style="font-size:0.85rem;padding:0.75rem 1.8rem;">Placement Details →</a>
+      <a href="https://vcet.edu.in/training/" target="_blank" class="btn-secondary" style="font-size:0.85rem;padding:0.75rem 1.8rem;">Training Programs</a>
+      <a href="https://vcet.edu.in/e-cell/" target="_blank" class="btn-secondary" style="font-size:0.85rem;padding:0.75rem 1.8rem;">E-Cell</a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- RESEARCH -->
+<section class="section-pad research-section" id="research">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Innovation Hub</div>
+      <h2 class="section-title">Research & <span class="grad">Discovery</span></h2>
+      <p class="section-sub">Driving innovation through funded research, patents, publications, and industry consultancy.</p>
+    </div>
+    <div class="research-grid">
+      <a href="https://vcet.edu.in/funded-research/" target="_blank" class="res-card reveal">
+        <div class="res-num">₹1L+</div>
+        <div class="res-title">Funded Research</div>
+        <div class="res-desc">AICTE SPICES grant and multiple funded research projects across departments.</div>
+      </a>
+      <a href="https://vcet.edu.in/publications-journals-conference-books-patents/" target="_blank" class="res-card reveal reveal-delay-1">
+        <div class="res-num">500+</div>
+        <div class="res-title">Publications</div>
+        <div class="res-desc">Journals, conference papers, books, and patents by faculty and students.</div>
+      </a>
+      <a href="https://vcet.edu.in/patents/" target="_blank" class="res-card reveal reveal-delay-2">
+        <div class="res-num">2+</div>
+        <div class="res-title">Patents Awarded</div>
+        <div class="res-desc">Vaishali Shirsath & Pragati Patil — granted patents for innovative research.</div>
+      </a>
+      <a href="https://vcet.edu.in/iic/" target="_blank" class="res-card reveal">
+        <div class="res-num">IIC</div>
+        <div class="res-title">Innovation Cell</div>
+        <div class="res-desc">Institution's Innovation Council fostering entrepreneurship and start-up culture on campus.</div>
+      </a>
+      <a href="https://vcet.edu.in/nirf/" target="_blank" class="res-card reveal reveal-delay-1">
+        <div class="res-num">NIRF</div>
+        <div class="res-title">National Ranking</div>
+        <div class="res-desc">VCET ranked under NIRF — National Institutional Ranking Framework by MHRD.</div>
+      </a>
+      <a href="https://vcet.edu.in/consultancy-projects/" target="_blank" class="res-card reveal reveal-delay-2">
+        <div class="res-num">X-Band</div>
+        <div class="res-title">IITM Pune MoU</div>
+        <div class="res-desc">Doppler Weather Radar installation in collaboration with IITM Pune at VCET campus.</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- ACHIEVEMENTS -->
+<section class="section-pad achievements-section" id="achievements">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Hall of Fame</div>
+      <h2 class="section-title">Remarkable <span class="grad">Achievements</span></h2>
+      <p class="section-sub">Our students and faculty continue to make us proud at national and international stages.</p>
+    </div>
+    <div class="ach-grid">
+      <div class="ach-card reveal"><div class="ach-icon">🚀</div><div class="ach-name">Jitendra Prajapati</div><div class="ach-desc">Placed at Perplexity AI with a record package of ₹1.06 Crore Per Annum.</div></div>
+      <div class="ach-card reveal reveal-delay-1"><div class="ach-icon">☀️</div><div class="ach-name">5× National Champions</div><div class="ach-desc">First prize at Solar EV Championship 2025, Coimbatore — 9 prizes across categories.</div></div>
+      <div class="ach-card reveal reveal-delay-2"><div class="ach-icon">💻</div><div class="ach-name">SIH 2023 Grand Finale</div><div class="ach-desc">Team Softracker (IT-VCET) won the Smart India Hackathon 2023 Grand Finale.</div></div>
+      <div class="ach-card reveal"><div class="ach-icon">🤸</div><div class="ach-name">Palak Churi</div><div class="ach-desc">Selected for All India Inter University National Mallakhamb Competition 2025-26.</div></div>
+      <div class="ach-card reveal reveal-delay-1"><div class="ach-icon">🏎️</div><div class="ach-name">Team Centurion</div><div class="ach-desc">11th Rank at Quad Bike Design Challenge, Hyderabad.</div></div>
+      <div class="ach-card reveal reveal-delay-2"><div class="ach-icon">✈️</div><div class="ach-name">Team Airnova</div><div class="ach-desc">1st Place at SkyGlider Competition, Technex IIT (BHU) Varanasi — Ascension 2025.</div></div>
+      <div class="ach-card reveal"><div class="ach-icon">🏸</div><div class="ach-name">Shreyas Pathe</div><div class="ach-desc">Gold Medal in Badminton Men's Singles & Doubles at SKREAM 2025, Clara's College.</div></div>
+      <div class="ach-card reveal reveal-delay-1"><div class="ach-icon">🏆</div><div class="ach-name">VCET Kabaddi Team</div><div class="ach-desc">Runners Up at MIT WPU Pune National Level "SUMMIT" Championship 2025.</div></div>
+      <div class="ach-card reveal reveal-delay-2"><div class="ach-icon">♟️</div><div class="ach-name">Devanshi Solanki</div><div class="ach-desc">3rd Place at Maharashtra State University Chess Tournament.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- FACILITIES -->
+<section class="section-pad facilities-section" id="facilities">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Campus Infrastructure</div>
+      <h2 class="section-title">World-Class <span class="grad">Facilities</span></h2>
+      <p class="section-sub">State-of-the-art infrastructure to support learning, research, and overall student development.</p>
+    </div>
+    <div class="fac-grid">
+      <a href="https://vcet.edu.in/centeral-computing-facility/" target="_blank" class="fac-card reveal"><div class="fac-icon">🖥️</div><div class="fac-name">Central Computing Facility</div><div class="fac-sub">High-speed internet & servers</div></a>
+      <a href="https://vcet.edu.in/library/" target="_blank" class="fac-card reveal reveal-delay-1"><div class="fac-icon">📚</div><div class="fac-name">Library</div><div class="fac-sub">Digital & physical resources</div></a>
+      <a href="https://vcet.edu.in/sports-gymkhana/" target="_blank" class="fac-card reveal reveal-delay-2"><div class="fac-icon">⚽</div><div class="fac-name">Sports & Gymkhana</div><div class="fac-sub">Indoor & outdoor facilities</div></a>
+      <a href="https://vcet.edu.in/counselling-room/" target="_blank" class="fac-card reveal"><div class="fac-icon">🧠</div><div class="fac-name">Counselling Cell</div><div class="fac-sub">Student wellness support</div></a>
+      <a href="https://vcet.edu.in/aicte-idea-vcet/" target="_blank" class="fac-card reveal reveal-delay-1"><div class="fac-icon">💡</div><div class="fac-name">AICTE IDEA Lab</div><div class="fac-sub">Innovation & design lab</div></a>
+      <a href="https://vcet.edu.in/center-of-excellence-siemens/" target="_blank" class="fac-card reveal reveal-delay-2"><div class="fac-icon">🏭</div><div class="fac-name">Siemens CoE</div><div class="fac-sub">Center of Excellence</div></a>
+      <a href="https://vcet.edu.in/texas-instruments/" target="_blank" class="fac-card reveal"><div class="fac-icon">⚡</div><div class="fac-name">Texas Instruments Lab</div><div class="fac-sub">Innovation Lab</div></a>
+      <a href="https://vcet.edu.in/industry-sponsored-robotics-lab/" target="_blank" class="fac-card reveal reveal-delay-1"><div class="fac-icon">🤖</div><div class="fac-name">Robotics Lab</div><div class="fac-sub">Industry sponsored</div></a>
+      <a href="https://vcet.edu.in/oracle-academy/" target="_blank" class="fac-card reveal reveal-delay-2"><div class="fac-icon">🗄️</div><div class="fac-name">Oracle Academy</div><div class="fac-sub">Database & cloud training</div></a>
+      <a href="https://vcet.edu.in/ladies-common-room/" target="_blank" class="fac-card reveal"><div class="fac-icon">🌸</div><div class="fac-name">Ladies Common Room</div><div class="fac-sub">Safe & welcoming space</div></a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- STUDENT LIFE -->
+<section class="section-pad student-section" id="student-life" style="background:var(--bg2);">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Campus Life</div>
+      <h2 class="section-title">Life @ <span class="grad">VCET</span></h2>
+      <p class="section-sub">Beyond academics — a vibrant ecosystem of clubs, committees, cultural events, and technical societies.</p>
+    </div>
+    <div class="student-grid">
+      <a href="https://vcet.edu.in/students-council/" target="_blank" class="student-card reveal"><div class="student-icon">🎓</div><div class="student-cat">Governance</div><div class="student-name">Students' Council</div></a>
+      <a href="https://vcet.edu.in/cultural-committee/" target="_blank" class="student-card reveal reveal-delay-1"><div class="student-icon">🎭</div><div class="student-cat">Extra-curricular</div><div class="student-name">Cultural Committee</div></a>
+      <a href="https://vcet.edu.in/sports-committee/" target="_blank" class="student-card reveal reveal-delay-2"><div class="student-icon">🏃</div><div class="student-cat">Extra-curricular</div><div class="student-name">Sports Committee</div></a>
+      <a href="https://vcet.edu.in/nss/" target="_blank" class="student-card reveal"><div class="student-icon">🤝</div><div class="student-cat">Social Service</div><div class="student-name">NSS</div></a>
+      <a href="https://vcet.edu.in/ieee/" target="_blank" class="student-card reveal reveal-delay-1"><div class="student-icon">⚡</div><div class="student-cat">Technical</div><div class="student-name">IEEE Student Chapter</div></a>
+      <a href="https://vcet.edu.in/hackathon/" target="_blank" class="student-card reveal reveal-delay-2"><div class="student-icon">💻</div><div class="student-cat">Innovation</div><div class="student-name">Hackathon Cell</div></a>
+      <a href="https://vcet.edu.in/csi-2/" target="_blank" class="student-card reveal"><div class="student-icon">🖥️</div><div class="student-cat">Technical</div><div class="student-name">CSI</div></a>
+      <a href="https://vcet.edu.in/iete/" target="_blank" class="student-card reveal reveal-delay-1"><div class="student-icon">📡</div><div class="student-cat">Technical</div><div class="student-name">IETE</div></a>
+      <a href="https://vcet.edu.in/ethanracing24/Team_Ethan_Racing_Website-main/index.html" target="_blank" class="student-card reveal reveal-delay-2"><div class="student-icon">🏎️</div><div class="student-cat">Club</div><div class="student-name">ETHAN Racing</div></a>
+      <a href="http://vcet.edu.in/VcetSolecthon" target="_blank" class="student-card reveal"><div class="student-icon">☀️</div><div class="student-cat">Club</div><div class="student-name">SOLECTHON</div></a>
+      <a href="https://vcet.edu.in/airnova/" target="_blank" class="student-card reveal reveal-delay-1"><div class="student-icon">✈️</div><div class="student-cat">Club</div><div class="student-name">AIRNOVA</div></a>
+      <a href="https://vcet.edu.in/literati/" target="_blank" class="student-card reveal reveal-delay-2"><div class="student-icon">📖</div><div class="student-cat">Literary</div><div class="student-name">Literati</div></a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- COMMITTEES -->
+<section class="section-pad committees-section" id="committees">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Governance</div>
+      <h2 class="section-title">Committees & <span class="grad">Cells</span></h2>
+    </div>
+    <div class="comm-grid">
+      <a href="https://vcet.edu.in/iqac/" target="_blank" class="comm-card reveal"><div class="comm-icon">📋</div><div><div class="comm-name">IQAC</div><div class="comm-sub">Internal Quality Assurance Cell</div></div></a>
+      <a href="https://vcet.edu.in/college-development-committee/" target="_blank" class="comm-card reveal reveal-delay-1"><div class="comm-icon">🏛️</div><div><div class="comm-name">CDC</div><div class="comm-sub">College Development Committee</div></div></a>
+      <a href="https://vcet.edu.in/grievance-redressal-committee/" target="_blank" class="comm-card reveal reveal-delay-2"><div class="comm-icon">⚖️</div><div><div class="comm-name">Grievance Redressal</div><div class="comm-sub">Student & Faculty Grievances</div></div></a>
+      <a href="https://vcet.edu.in/anti-ragging-committee/" target="_blank" class="comm-card reveal"><div class="comm-icon">🛡️</div><div><div class="comm-name">Anti-Ragging Committee</div><div class="comm-sub">Zero tolerance policy</div></div></a>
+      <a href="https://vcet.edu.in/internal-complaint-committee/" target="_blank" class="comm-card reveal reveal-delay-1"><div class="comm-icon">🔏</div><div><div class="comm-name">Internal Complaint Comm.</div><div class="comm-sub">Safe campus initiative</div></div></a>
+      <a href="https://vcet.edu.in/sc-st-committee/" target="_blank" class="comm-card reveal reveal-delay-2"><div class="comm-icon">🤝</div><div><div class="comm-name">SC-ST Committee</div><div class="comm-sub">Equal opportunity support</div></div></a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- NAAC -->
+<section class="section-pad naac-section" id="naac">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Accreditation</div>
+      <h2 class="section-title">NAAC & <span class="grad">NBA</span> Accredited</h2>
+      <p class="section-sub">Certified for excellence in quality education, research, and institutional development.</p>
+    </div>
+    <div class="naac-grid">
+      <div class="naac-score-visual reveal">
+        <div style="font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">NAAC Score</div>
+        <div class="naac-score">A</div>
+        <div class="naac-grade">Grade A · NAAC Accredited</div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);width:100%;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:var(--accent);">NBA</div>
+          <div style="font-size:0.72rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:0.08em;">Multiple Programs Accredited</div>
+        </div>
+      </div>
+      <div class="naac-links reveal reveal-delay-1">
+        <a href="https://vcet.edu.in/NAAC/NAAC_SSR_Cycle1.html" target="_blank" class="naac-link"><div class="naac-link-icon">📄</div><div><div class="naac-link-title">SSR Cycle 1</div><div class="naac-link-sub">Self Study Report — Cycle 1</div></div><div style="margin-left:auto;color:var(--gold);">→</div></a>
+        <a href="https://vcet.edu.in/NAAC/NAAC_SSR_Cycle2.html" target="_blank" class="naac-link"><div class="naac-link-icon">📄</div><div><div class="naac-link-title">SSR Cycle 2</div><div class="naac-link-sub">Self Study Report — Cycle 2</div></div><div style="margin-left:auto;color:var(--gold);">→</div></a>
+        <a href="https://vcet.edu.in/sss-report/" target="_blank" class="naac-link"><div class="naac-link-icon">📊</div><div><div class="naac-link-title">SSS Report</div><div class="naac-link-sub">Student Satisfaction Survey</div></div><div style="margin-left:auto;color:var(--gold);">→</div></a>
+        <a href="https://vcet.edu.in/best-practices-and-institutional-distinctiveness/" target="_blank" class="naac-link"><div class="naac-link-icon">⭐</div><div><div class="naac-link-title">Best Practices</div><div class="naac-link-sub">Institutional Distinctiveness</div></div><div style="margin-left:auto;color:var(--gold);">→</div></a>
+        <a href="https://vcet.edu.in/wp-content/uploads/2025/03/Naac-Certificate.pdf" target="_blank" class="naac-link"><div class="naac-link-icon">🏅</div><div><div class="naac-link-title">NAAC Certificate</div><div class="naac-link-sub">Download Official Accreditation</div></div><div style="margin-left:auto;color:var(--gold);">↓</div></a>
+        <a href="https://vcet.edu.in/wp-content/uploads/2025/11/NBA_Certificate.pdf" target="_blank" class="naac-link"><div class="naac-link-icon">🏅</div><div><div class="naac-link-title">NBA Certificate</div><div class="naac-link-sub">Download NBA Accreditation</div></div><div style="margin-left:auto;color:var(--gold);">↓</div></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- GALLERY -->
+<section class="section-pad gallery-section" id="gallery" style="background:var(--bg);">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Our Campus</div>
+      <h2 class="section-title">Explore <span class="grad">VCET</span></h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal" style="background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(123,79,255,0.08));">
+        <div class="gallery-emoji">🏛️</div>
+        <div class="gallery-overlay"><div class="gallery-name">VCET Campus</div></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" style="background:linear-gradient(135deg,rgba(123,79,255,0.08),rgba(0,200,255,0.08));">
+        <div class="gallery-emoji">💡</div>
+        <div class="gallery-overlay"><div class="gallery-name">AICTE IDEA Lab</div></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-2" style="background:linear-gradient(135deg,rgba(255,79,123,0.08),rgba(0,200,255,0.08));">
+        <div class="gallery-emoji">🤖</div>
+        <div class="gallery-overlay"><div class="gallery-name">Robotics Lab</div></div>
+      </div>
+      <div class="gallery-item reveal" style="background:linear-gradient(135deg,rgba(240,192,64,0.08),rgba(123,79,255,0.08));">
+        <div class="gallery-emoji">📚</div>
+        <div class="gallery-overlay"><div class="gallery-name">Library</div></div>
+      </div>
+      <div class="gallery-item reveal reveal-delay-1" style="background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(255,79,123,0.08));">
+        <div class="gallery-emoji">🏭</div>
+        <div class="gallery-overlay"><div class="gallery-name">Siemens CoE</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- EXPLORE -->
+<section class="section-pad explore-section" id="explore">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Quick Links</div>
+      <h2 class="section-title">Explore <span class="grad">VCET</span></h2>
+    </div>
+    <div class="explore-grid">
+      <a href="https://www.youtube.com/watch?v=8He2x-kDRkQ" target="_blank" class="explore-card reveal">
+        <div class="explore-icon">▶️</div>
+        <div class="explore-title">Campus Video Tour</div>
+        <div class="explore-sub">Watch VCET on YouTube</div>
+      </a>
+      <a href="http://erp.vcet.edu.in/login.htm" target="_blank" class="explore-card reveal reveal-delay-1">
+        <div class="explore-icon">🖥️</div>
+        <div class="explore-title">ERP Student Portal</div>
+        <div class="explore-sub">Login to VCET ERP System</div>
+      </a>
+      <a href="https://alumni.vcet.edu.in/" target="_blank" class="explore-card reveal reveal-delay-2">
+        <div class="explore-icon">🤝</div>
+        <div class="explore-title">Alumni Portal</div>
+        <div class="explore-sub">Stay connected with VCET</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- TESTIMONIALS -->
+<section class="section-pad testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Alumni Voices</div>
+      <h2 class="section-title">What They <span class="grad">Say</span></h2>
+    </div>
+    <div class="test-grid">
+      <div class="test-card reveal">
+        <div class="test-quote">"</div>
+        <p class="test-text">The four years at VCET were an amazing experience. The diverse coursework helped me explore multiple fields and pursue my Masters overseas. The values I learned left a huge impact on my life.</p>
+        <div class="test-author">
+          <div class="test-avatar">VK</div>
+          <div><div class="test-name">Vinit Kanvinde</div><div class="test-role">Network Engineer at Google</div></div>
+        </div>
+      </div>
+      <div class="test-card reveal reveal-delay-1">
+        <div class="test-quote">"</div>
+        <p class="test-text">VCET is a very agile institution. The enthusiasm, rigor and perseverance ingrained from day one continues to stay with me. I will be ever grateful to be a part of this institution.</p>
+        <div class="test-author">
+          <div class="test-avatar" style="background:linear-gradient(135deg,var(--accent3),var(--accent2));">DA</div>
+          <div><div class="test-name">Dr. Amrita M A</div><div class="test-role">Manager Learning Studio, I-Nurture Solutions</div></div>
+        </div>
+      </div>
+      <div class="test-card reveal reveal-delay-2">
+        <div class="test-quote">"</div>
+        <p class="test-text">State-of-art infrastructure with highly qualified professors makes VCET great in all terms. I am proud to be an alumnus of this esteemed institution.</p>
+        <div class="test-author">
+          <div class="test-avatar" style="background:linear-gradient(135deg,var(--accent2),var(--accent3));">AV</div>
+          <div><div class="test-name">Amit Verma</div><div class="test-role">Product & Process Manager, BillDesk</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<!-- FOOTER / CONTACT -->
+<footer id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">VCET — Vidyavardhini's</div>
+        <p class="footer-tagline">College of Engineering & Technology, Vasai Road. Autonomous Institute affiliated to University of Mumbai. Approved by AICTE & DTE.</p>
+        <div class="footer-contact">
+          <p>📍 K.T. Marg, Vartak College Campus,<br>Vasai Road (W), Dist-Palghar,<br>Maharashtra 401202</p>
+          <p style="margin-top:0.6rem;">📞 <a href="tel:+917972019446">+91 7972019446</a> · <a href="tel:+917558351747">+91 7558351747</a></p>
+          <p>☎️ 0250 233 8234 (6 Lines)</p>
+          <p>📧 <a href="mailto:vcet_inbox@vcet.edu.in">vcet_inbox@vcet.edu.in</a></p>
+        </div>
+        <div class="social-links">
+          <a href="https://www.facebook.com/vcet.vasai.50/" target="_blank" class="social-link" title="Facebook">📘</a>
+          <a href="https://www.instagram.com/official.vcet/" target="_blank" class="social-link" title="Instagram">📸</a>
+          <a href="https://www.linkedin.com/school/vcetvasai/" target="_blank" class="social-link" title="LinkedIn">💼</a>
+          <a href="https://www.youtube.com/channel/UCjBw5a7WU00GwkxaTjF9jqg" target="_blank" class="social-link" title="YouTube">▶️</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="#">Mandatory Disclosure</a></li>
+          <li><a href="https://vcet.edu.in/income-expenditure/" target="_blank">Audited Statement</a></li>
+          <li><a href="#" target="_blank">EOA 1994–2024</a></li>
+          <li><a href="#" target="_blank">EOA Report 25-26</a></li>
+          <li><a href="https://vcet.edu.in/german-language-club/" target="_blank">German Language Club</a></li>
+          <li><a href="https://vcet.edu.in/wp-content/uploads/2025/05/Recruitment-Advertise-15-May-2025.pdf" target="_blank">Career @ VCET</a></li>
+          <li><a href="https://alumni.vcet.edu.in/" target="_blank">Alumni Portal</a></li>
+          <li><a href="http://erp.vcet.edu.in/login.htm" target="_blank">ERP Portal</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-heading">Useful Links</div>
+        <ul class="footer-links">
+          <li><a href="https://mu.ac.in/" target="_blank">Mumbai University</a></li>
+          <li><a href="https://www.aicte-india.org/" target="_blank">AICTE</a></li>
+          <li><a href="https://dte.maharashtra.gov.in/" target="_blank">DTE Maharashtra</a></li>
+          <li><a href="https://nptel.ac.in/" target="_blank">Swayam-NPTEL</a></li>
+          <li><a href="https://www.aicte-india.org/feedback/index.php" target="_blank">AICTE Feedback</a></li>
+          <li><a href="#" target="_blank">Online Grievance Form</a></li>
+          <li><a href="#" target="_blank">Helpline for Divyagjan</a></li>
+          <li><a href="https://vcet.edu.in/wp-content/uploads/2021/11/Educational_verification-1-1.pdf" target="_blank">Education Verification</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-heading">Apply Now</div>
+        <div style="display:flex;flex-direction:column;gap:0.8rem;">
+          <a href="https://forms.gle/uh7sZS5JLzn2RecG7" target="_blank" class="btn-primary" style="text-align:center;font-size:0.82rem;padding:0.75rem 1.2rem;">B.E. Enquiry 2026-27</a>
+          <a href="https://forms.gle/kb1AXRDA4xGeo3kT7" target="_blank" class="btn-secondary" style="text-align:center;font-size:0.82rem;padding:0.7rem 1.2rem;">M.E. Enquiry 2026-27</a>
+          <a href="https://forms.gle/VF3BzuyNPp2u3cBT9" target="_blank" class="btn-secondary" style="text-align:center;font-size:0.82rem;padding:0.7rem 1.2rem;">MMS Enquiry 2026-27</a>
+        </div>
+        <div style="margin-top:1.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem;font-size:0.8rem;color:var(--muted);">
+          <div style="color:var(--accent);font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.08em;margin-bottom:0.4rem;">EXAM PORTAL</div>
+          <a href="https://vcet.edu.in/awards-achievements/" target="_blank" style="color:var(--text);text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;">Exam & Awards →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 VCET. All Rights Reserved. Designed with ♥ | Autonomous Institute</div>
+      <div class="footer-links-bottom">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+        <a href="https://vcet.edu.in/contact-us-2/" target="_blank">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursorTrail');
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+setInterval(() => {
+  trail.style.left = mx + 'px';
+  trail.style.top = my + 'px';
+}, 80);
+document.querySelectorAll('a,button,.dept-card,.adm-card,.fac-card,.student-card,.explore-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; cursor.style.background = 'var(--accent2)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; cursor.style.background = 'var(--accent)'; });
+});
+
+// STARS
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 180; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const t = Date.now() * 0.001;
+  stars.forEach(s => {
+    const alpha = s.a * (0.5 + 0.5 * Math.sin(t * s.speed * 10 + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200,230,255,${alpha})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resizeCanvas(); initStars(); drawStars();
+window.addEventListener('resize', () => { resizeCanvas(); initStars(); });
+
+// PARTICLES
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 1;
+    const colors = ['rgba(0,200,255,0.4)','rgba(123,79,255,0.4)','rgba(255,79,123,0.3)'];
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*15+8}s;animation-delay:${Math.random()*10}s;`;
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+// NAVBAR SCROLL
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// MOBILE MENU
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+function closeMobile() {
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+}
+
+// REVEAL ON SCROLL
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// COUNTER ANIMATION
+function animateCount(el, target, suffix = '') {
+  let start = 0;
+  const duration = 1800;
+  const step = (timestamp) => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(eased * target) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const statObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.animated) {
+      e.target.dataset.animated = '1';
+      const num = e.target.textContent;
+      if (num.includes('299')) animateCount(e.target, 299);
+      else if (num.includes('320')) animateCount(e.target, 320);
+      else if (num.includes('305')) animateCount(e.target, 305);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.pl-stat-num').forEach(el => statObserver.observe(el));
+</script>
+</body>
+</html>
